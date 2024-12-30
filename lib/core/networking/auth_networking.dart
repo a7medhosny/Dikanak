@@ -4,7 +4,7 @@ import 'package:dikanak/core/networking/consts.dart';
 class AuthNetworking {
   final Dio dio;
 
-  AuthNetworking(this.dio);
+  AuthNetworking({required this.dio});
 
   // Common headers for all requests
 

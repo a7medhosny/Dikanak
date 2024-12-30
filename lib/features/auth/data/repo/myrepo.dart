@@ -1,11 +1,10 @@
 import 'package:dikanak/core/networking/auth_networking.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 
 class Myrepo {
   final AuthNetworking authNetworking;
 
-  Myrepo(this.authNetworking);
+  Myrepo({required this.authNetworking});
 
   register({
     required String name,
