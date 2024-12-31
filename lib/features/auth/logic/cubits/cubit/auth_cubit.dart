@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:dikanak/features/auth/data/models/user_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/repo/myrepo.dart';
@@ -52,6 +53,8 @@ class AuthCubit extends Cubit<AuthState> {
       if (response['success'] == true) {
         emit(LoginSuccess(userModel: UserModel.fromJson(response["data"])));
       } else {
+        debugPrint("login ERROR is ${response['message']}");
+
         emit(AuthFailure(response['message'] ?? 'Login failed'));
       }
     } catch (e) {

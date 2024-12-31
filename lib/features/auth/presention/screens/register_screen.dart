@@ -1,5 +1,5 @@
+import 'package:dikanak/core/routing/routes.dart';
 import 'package:dikanak/features/auth/logic/cubits/cubit/auth_cubit.dart';
-import 'package:dikanak/features/auth/presention/widgets/form_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final phoneController = TextEditingController();
   final nameController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
@@ -45,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
         } else if (state is AuthFailure) {
           debugPrint("ERROR is ${state.errorMessage}");
-
+          Navigator.pop(context); // Close the loading alertDialog
           showAlertDialog(
             context: context,
             backgroundColor: Colors.red,
@@ -56,8 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
         } else if (state is RegisterSuccess) {
           Navigator.pop(context); // Close the alertDialog
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => LoginScreen()));
+          Navigator.pushReplacementNamed(context, Routes.loginScreen);
         }
       },
       builder: (context, state) {
@@ -76,31 +76,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Center(
+                        child: Text(
+                          'Dikanak',
+                          style: TextStyle(
+                              fontSize: 50, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      SizedBox(height: 60),
                       Text(
                         "Sign Up",
                         style: TextStyle(
                             fontSize: 22.5, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 30),
-                      CustomTextField(
+                      customFormItem(
                         hintTitle: "User Name",
                         controller: nameController,
                       ),
                       SizedBox(height: 20),
-                      CustomTextField(
+                      customFormItem(
                         hintTitle: "Email",
                         controller: emailController,
                       ),
                       SizedBox(height: 20),
-                      CustomTextField(
+                      customFormItem(
                         hintTitle: "Phone",
                         controller: phoneController,
                       ),
                       SizedBox(height: 20),
-                      CustomTextField(
+                      customFormItem(
                         hintTitle: "Password",
                         controller: passwordController,
                       ),
+                      SizedBox(height: 20),
+                      customFormItem(
+                          hintTitle: "Confirm Password",
+                          controller: confirmPasswordController,
+                          isPasswordConfirmation: true),
                       SizedBox(height: 20),
                       MaterialButton(
                         minWidth: double.infinity,
@@ -112,7 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: const Color.fromARGB(255, 133, 132, 132),
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
-                                      debugPrint("Email is ${emailController.text}");
+                            debugPrint("Email is ${emailController.text}");
 
                             // Using BlocProvider to access the AuthCubit
                             BlocProvider.of<AuthCubit>(context).register(
@@ -144,12 +157,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           SizedBox(width: 4),
                           InkWell(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LoginScreen(),
-                                ),
-                              );
+                              Navigator.pushReplacementNamed(
+                                  context, Routes.loginScreen);
                             },
                             child: const Text('Login',
                                 style: TextStyle(
@@ -165,6 +174,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         );
+      },
+    );
+  }
+
+  Widget customFormItem({
+    required TextEditingController controller,
+    required String hintTitle,
+    bool isPasswordConfirmation = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hintTitle,
+        border: const OutlineInputBorder(),
+      ),
+      obscureText:
+          hintTitle.toLowerCase().contains("password"), // For password fields
+      validator: (input) {
+        if (input == null || input.isEmpty) {
+          return "$hintTitle must not be empty!";
+        }
+        if (isPasswordConfirmation && input != passwordController.text) {
+          return "Passwords must match!";
+        }
+        return null;
       },
     );
   }

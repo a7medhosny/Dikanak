@@ -32,7 +32,7 @@ class AuthNetworking {
     required String password,
   }) async {
     final response = await dio.post(
-      '${baseUrl}register',
+      '${baseUrl}login',
       data: {
         "email": email,
         "password": password,
