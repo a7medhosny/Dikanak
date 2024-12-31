@@ -2,73 +2,50 @@ import 'package:dikanak/features/home/data/model/banner_model.dart';
 import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class GetBanners extends StatefulWidget {
+class GetBanners extends StatelessWidget {
   const GetBanners({super.key});
-
-  @override
-  State<GetBanners> createState() => _GetBannersState();
-}
-
-class _GetBannersState extends State<GetBanners> {
-  @override
-  void initState() {
-    super.initState();
-    // استدعاء getBannerData عند فتح الشاشة
-    context.read<HomeCubit>().getBannerData();
-  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
-        if (state is HomeInitial) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is GetBannersSucess) {
-          return _buildHorizontalBannersList(state.banners);
-        } else if (state is GetBannersFailure) {
+        if (state is GetBannersFailure) {
           return _buildError(state.message);
-        } else {
+        } else if (state is HomeLoading || context.read<HomeCubit>().banners.isEmpty) {
           return const Center(child: CircularProgressIndicator());
+        } else {
+          return _buildHorizontalBannersList(context.read<HomeCubit>().banners);
         }
       },
     );
   }
 
   Widget _buildHorizontalBannersList(List<BannerModel> banners) {
-    return SizedBox(
-      height: 150, // التحكم بارتفاع القائمة
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal, // العرض أفقي
-        itemCount: banners.length,
-        itemBuilder: (context, index) {
-          final banner = banners[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    banner.image,
-                    width: 120, // التحكم بعرض الصورة
-                    height: 120, // التحكم بارتفاع الصورة
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  banner.category != null
-                      ? banner.category!.name
-                      : 'No Category',
-                  style: const TextStyle(fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+    final pageController = PageController();
+    return Column(
+      children: [
+        SizedBox(
+          height: 150,
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: PageView.builder(
+              controller: pageController,
+              itemCount: banners.length,
+              itemBuilder: (context, index) {
+                return Image.network(
+                  banners[index].image,
+                  fit: BoxFit.fill,
+                );
+              },
             ),
-          );
-        },
-      ),
+          ),
+        ),
+        const SizedBox(height: 15),
+        SmoothPageIndicator(controller: pageController, count: banners.length),
+      ],
     );
   }
 

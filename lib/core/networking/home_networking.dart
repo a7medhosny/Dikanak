@@ -10,4 +10,10 @@ class HomeNetworking {
     Response response = await dio.get("${baseUrl}banners");
     return response;
   }
+
+  getCategories() async {
+    Response response = await dio.get("${baseUrl}categories",
+        options: Options(headers: {'lang': 'en'}));
+    return response;
+  }
 }

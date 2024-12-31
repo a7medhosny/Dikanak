@@ -1,5 +1,5 @@
 import 'package:dikanak/core/networking/home_networking.dart';
-import 'package:dikanak/features/home/data/repo/HomeRepo.dart';
+import 'package:dikanak/features/home/data/repo/home_repo.dart';
 import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:dikanak/core/networking/auth_networking.dart';
