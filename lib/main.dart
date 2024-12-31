@@ -19,7 +19,7 @@ AppRouter appRouter=AppRouter();
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: Routes.registerScreen,
+      initialRoute: Routes.layoutScreen,
         onGenerateRoute: (settings) => appRouter.generateRoute(settings),
     );
   }
