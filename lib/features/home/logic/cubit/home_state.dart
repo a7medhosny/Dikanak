@@ -28,3 +28,13 @@ final class GetCategoriesFailure extends HomeState {
 
   GetCategoriesFailure(this.message);
 }
+final class GetProductsSucess extends HomeState {
+  final List<ProductModel> products;
+  GetProductsSucess({required this.products});
+}
+
+final class GetProductsFailure extends HomeState {
+  final String message;
+
+  GetProductsFailure(this.message);
+}

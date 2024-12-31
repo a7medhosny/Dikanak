@@ -16,4 +16,9 @@ class HomeNetworking {
         options: Options(headers: {'lang': 'en'}));
     return response;
   }
+  getProducts() async {
+    Response response = await dio.get("${baseUrl}home",
+        options: Options(headers: {'lang': 'en'}));
+    return response;
+  }
 }

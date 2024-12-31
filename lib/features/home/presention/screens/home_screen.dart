@@ -1,6 +1,7 @@
 import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
 import 'package:dikanak/features/home/presention/widgets/get_banners.dart';
 import 'package:dikanak/features/home/presention/widgets/get_categories.dart';
+import 'package:dikanak/features/home/presention/widgets/get_products.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     BlocProvider.of<HomeCubit>(context)
       ..getBannerData()
-      ..getCategories();
+      ..getCategories()..getProducts();
   }
 
   @override
@@ -40,6 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 20,
             ),
             GetCategories(),
+            SizedBox(
+              height: 20,
+            ),
+            GetProducts(),
+             SizedBox(
+              height: 30,
+            ),
+
           ],
         ),
       ),
