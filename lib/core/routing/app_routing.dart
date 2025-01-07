@@ -48,7 +48,11 @@ class AppRouter {
                 create: (context) => LayoutCubit(),
               ),
               BlocProvider(
-                create: (context) => getIt<HomeCubit>(),
+                create: (context) => getIt<HomeCubit>()
+                  ..getBannerData()
+                  ..getCategories()
+                  ..getProducts()
+                  ..getFavorites(),
               ),
             ],
             child: LayoutScreen(),

@@ -1,5 +1,6 @@
 import 'package:dikanak/features/home/data/model/category_model.dart';
 import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
+import 'package:dikanak/features/layout/logic/cubits/cubit/layout_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,16 +13,18 @@ class GetCategories extends StatelessWidget {
       builder: (context, state) {
         if (state is GetCategoriesFailure) {
           return _buildError(state.message);
-        } else if (state is HomeLoading || context.read<HomeCubit>().categories.isEmpty) {
+        } else if (state is GetCategoriesLoading ||
+            context.read<HomeCubit>().categories.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         } else {
-          return _buildCategoriesList(context.read<HomeCubit>().categories);
+          return _buildCategoriesList(
+              context.read<HomeCubit>().categories, context);
         }
       },
     );
   }
 
-  Widget _buildCategoriesList(List<CategoryModel> categories) {
+  Widget _buildCategoriesList(List<CategoryModel> categories, context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -29,14 +32,19 @@ class GetCategories extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text(
                 'Categories',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              Text(
-                'View All',
-                style: TextStyle(fontSize: 16, color: Colors.blue),
+              InkWell(
+                onTap: () {
+                  BlocProvider.of<LayoutCubit>(context).changeIndex(index: 1);
+                },
+                child: Text(
+                  'View All',
+                  style: TextStyle(fontSize: 16, color: Colors.blue),
+                ),
               ),
             ],
           ),

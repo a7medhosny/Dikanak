@@ -1,8 +1,10 @@
 import 'package:dikanak/core/networking/home_networking.dart';
 import 'package:dikanak/features/home/data/model/banner_model.dart';
 import 'package:dikanak/features/home/data/model/category_model.dart';
+import 'package:dikanak/features/home/data/model/favorite_product_model.dart';
 import 'package:dikanak/features/home/data/model/product_model.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class HomeRepo {
   final HomeNetworking homeNetworking;
@@ -70,6 +72,54 @@ class HomeRepo {
           return {
             'success': true,
             'data': products,
+          };
+        } else {
+          return {'success': false, 'message': jsonData["message"]};
+        }
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An unexpected error occurred: ${e.toString()}'
+      };
+    }
+  }
+
+  updateFavorites({required String productId}) async {
+    try {
+      Response response =
+          await homeNetworking.updateFavorites(productId: productId);
+      if (response.statusCode == 200) {
+        var jsonData = response.data;
+        if (jsonData['status'] == true) {
+          return {
+            'success': true,
+          };
+        } else {
+          return {'success': false, 'message': jsonData["message"]};
+        }
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An unexpected error occurred: ${e.toString()}'
+      };
+    }
+  }
+
+  getFavorites() async {
+    try {
+      Response response = await homeNetworking.getFavorites();
+      if (response.statusCode == 200) {
+        var jsonData = response.data;
+        if (jsonData['status'] == true) {
+     
+          List<FavoriteProductModel> favorites = (jsonData['data']['data'] as List)
+              .map((item) =>FavoriteProductModel.fromJson(item['product']))
+              .toList();
+          return {
+            'success': true,
+            'data': favorites,
           };
         } else {
           return {'success': false, 'message': jsonData["message"]};

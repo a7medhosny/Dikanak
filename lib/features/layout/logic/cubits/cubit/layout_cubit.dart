@@ -1,4 +1,6 @@
 import 'package:bloc/bloc.dart';
+import 'package:dikanak/features/home/presention/screens/categories_screen.dart';
+import 'package:dikanak/features/home/presention/screens/favorites_screen.dart';
 import 'package:dikanak/features/home/presention/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
@@ -10,8 +12,8 @@ class LayoutCubit extends Cubit<LayoutState> {
   int bottomNavIndex = 0;
   List<Widget> screens = [
     HomeScreen(),
-    HomeScreen(),
-    HomeScreen(),
+    CategoriesScreen(),
+   FavoritesScreen(),
     HomeScreen(),
     HomeScreen(),
   ];

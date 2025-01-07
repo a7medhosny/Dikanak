@@ -10,11 +10,14 @@ class GetProducts extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
-        if (state is GetProductsFailure) {
-          return _buildError(state.message);
-        } else if (state is HomeLoading ||
+        if (state is GetProductsFailure || state is UpdateFavoritesFailure) {
+          final message = (state as dynamic).message ?? 'An error occurred';
+          return _buildError(message);
+        } else if (state is GetProductsLoading ||
             context.read<HomeCubit>().products.isEmpty) {
           return const Center(child: CircularProgressIndicator());
+        } else if (state is FilterProductsSucess) {
+          return _buildProductsGrid(state.filterProducts);
         } else {
           return _buildProductsGrid(context.read<HomeCubit>().products);
         }
@@ -44,109 +47,90 @@ class GetProducts extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: SizedBox(
-            height: 500,
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          topRight: Radius.circular(10.0),
+              height: 500,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 0.8,
+                ),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  final isFavorite = context
+                          .read<HomeCubit>()
+                          .favoritesStatus[product.id.toString()] ??
+                      false;
+
+                  return Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10.0),
+                            topRight: Radius.circular(10.0),
+                          ),
+                          child: Image.network(
+                            product.image,
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                        child: Image.network(
-                          product.image,
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product.name,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product.name,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                product.discount == 0
-                                    ? Text(
-                                        '\$${product.price}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.green,
-                                        ),
-                                      )
-                                    : Row(
-                                        children: [
-                                          Text(
-                                            '\$${product.oldPrice}',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                              decorationColor: Colors.black,
-                                              decorationThickness: 2,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            '\$${product.price}',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.green,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                Spacer(),
-                                Expanded(
-                                  child: IconButton(
-                                      onPressed: () {},
-                                      icon: product.inFavorites
-                                          ? Icon(Icons.favorite)
-                                          : Icon(Icons.favorite_outline)),
-                                ),
-                                SizedBox(
-                                  width: 12,
-                                ),
-                              ],
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Text(
+                                    '\$${product.price}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    onPressed: () {
+                                      BlocProvider.of<HomeCubit>(context)
+                                          .updateFavorites(
+                                              productId: product.id.toString());
+                                    },
+                                    icon: Icon(
+                                      isFavorite
+                                          ? Icons.favorite
+                                          : Icons.favorite_outline,
+                                      color: isFavorite ? Colors.red : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
+                      ],
+                    ),
+                  );
+                },
+              )),
         ),
       ],
     );

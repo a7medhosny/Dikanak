@@ -13,7 +13,7 @@ class GetBanners extends StatelessWidget {
       builder: (context, state) {
         if (state is GetBannersFailure) {
           return _buildError(state.message);
-        } else if (state is HomeLoading || context.read<HomeCubit>().banners.isEmpty) {
+        } else if (state is GetBannersLoading || context.read<HomeCubit>().banners.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         } else {
           return _buildHorizontalBannersList(context.read<HomeCubit>().banners);

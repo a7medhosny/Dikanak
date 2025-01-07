@@ -1,3 +1,5 @@
+import 'package:dikanak/core/helpers/local_storage/shared_preferences.dart';
+import 'package:dikanak/core/networking/consts.dart';
 import 'package:dikanak/core/routing/routes.dart';
 import 'package:dikanak/features/auth/presention/widgets/alert_diolag.dart';
 import 'package:flutter/cupertino.dart';
@@ -47,8 +49,10 @@ class LoginScreen extends StatelessWidget {
             ),
           );
         } else if (state is LoginSuccess) {
-          Navigator.pop(context); // Close the alertDialog
-          Navigator.pushReplacementNamed(context, Routes.loginScreen);
+          Navigator.pop(context);
+          CacheNetwork.insertToCache(
+              key: token, value: state.userModel.token);
+          Navigator.pushReplacementNamed(context, Routes.layoutScreen);
         }
       },
       builder: (context, state) {
