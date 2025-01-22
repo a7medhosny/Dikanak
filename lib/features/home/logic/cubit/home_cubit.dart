@@ -1,11 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:dikanak/features/home/data/model/banner_model.dart';
 import 'package:dikanak/features/home/data/model/category_model.dart';
-import 'package:dikanak/features/home/data/model/favorite_product_model.dart';
 import 'package:dikanak/features/home/data/model/product_model.dart';
 import 'package:dikanak/features/home/data/repo/home_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+
+import '../../../common/test.dart';
 
 part 'home_state.dart';
 
@@ -13,10 +14,7 @@ class HomeCubit extends Cubit<HomeState> {
   final HomeRepo homeRepo;
   List<CategoryModel> categories = [];
   List<BannerModel> banners = [];
-  List<ProductModel> products = [];
-  List<FavoriteProductModel> favorites = [];
   List<ProductModel> filterProducts = [];
-  Map<String, bool> favoritesStatus = {}; // Local state for favorites
 
   HomeCubit(this.homeRepo) : super(HomeInitial());
   getBannerData() async {
@@ -62,6 +60,9 @@ class HomeCubit extends Cubit<HomeState> {
           for (var product in products)
             product.id.toString(): product.inFavorites
         };
+       cartStatus = {
+          for (var product in products) product.id.toString(): product.inCart
+        };
 
         emit(GetProductsSucess(products: products));
       } else {
@@ -72,56 +73,9 @@ class HomeCubit extends Cubit<HomeState> {
       emit(GetProductsFailure(e.toString()));
     }
   }
-
-  // Update favorites locally and sync with the server
-  updateFavorites({required String productId}) async {
-    // Toggle local state
-    favoritesStatus[productId] = !(favoritesStatus[productId] ?? false);
-    favorites = products
-        .where((product) => (favoritesStatus[product.id.toString()] == true &&
-            !favorites
-                .contains(FavoriteProductModel.fromJson(product.toJson()))))
-        .map((product) => FavoriteProductModel.fromJson(product.toJson()))
-        .toList();
-
-    emit(UpdateFavoritesSucess());
-
-    // getFavorites();
-    // Sync with the server
-    try {
-      var response = await homeRepo.updateFavorites(productId: productId);
-      if (response['success'] != true) {
-        // Revert local state on failure
-        favoritesStatus[productId] = !(favoritesStatus[productId] ?? false);
-        emit(UpdateFavoritesFailure(
-            response['message'] ?? 'Failed to update favorites'));
-      }
-    } catch (e) {
-      // Revert local state on error
-      favoritesStatus[productId] = !(favoritesStatus[productId] ?? false);
-      emit(UpdateFavoritesFailure(e.toString()));
-    }
-  }
-
-  getFavorites() async {
-    // emit(GetFavoritesLoading());
-    try {
-      var response = await homeRepo.getFavorites();
-      if (response['success'] == true) {
-        favorites = response['data'];
-        emit(GetFavoritesSucess(favorites: favorites));
-      } else {
-        emit(GetFavoritesFailure(
-            response['message'] ?? 'Failed to get products'));
-      }
-    } catch (e) {
-      emit(GetFavoritesFailure(e.toString()));
-    }
-  }
-
   getFilterProducts(input) {
     filterProducts = products
-        .where((product) => product.name!
+        .where((product) => product.name
             .toLowerCase()
             .startsWith(input.toString().toLowerCase()))
         .toList();

@@ -1,8 +1,8 @@
-import 'package:dikanak/features/home/data/model/favorite_product_model.dart';
-import 'package:dikanak/features/home/data/model/product_model.dart';
-import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
+import 'package:dikanak/features/favorite/logic/cubit/favorite_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../data/model/favorite_product_model.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -19,18 +19,16 @@ class FavoritesScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: BlocBuilder<HomeCubit, HomeState>(
+      body: BlocBuilder<FavoriteCubit, FavoriteState>(
         builder: (context, state) {
-          debugPrint("${context.read<HomeCubit>().favorites.length}");
           if (state is GetFavoritesFailure) {
             return _buildError(state.message);
-          } else if (state is GetFavoritesLoading ||
-              context.read<HomeCubit>().favorites.isEmpty) {
+          } else if (state is GetFavoritesLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is GetFavoritesSucess) {
             return _buildFavoritesGrid(state.favorites);
           } else {
-            return _buildFavoritesGrid(context.read<HomeCubit>().favorites);
+            return _buildFavoritesGrid(context.read<FavoriteCubit>().favorites);
           }
         },
       ),
@@ -106,7 +104,7 @@ class FavoritesScreen extends StatelessWidget {
                           const Spacer(),
                           IconButton(
                             onPressed: () {
-                              BlocProvider.of<HomeCubit>(context)
+                              BlocProvider.of<FavoriteCubit>(context)
                                   .updateFavorites(
                                       productId: product.id.toString());
                             },
@@ -114,6 +112,10 @@ class FavoritesScreen extends StatelessWidget {
                               Icons.favorite,
                               color: Colors.red,
                             ),
+                            splashColor:
+                                Colors.transparent, // Removes the splash effect
+                            highlightColor: Colors
+                                .transparent, // Removes the highlight effect
                           ),
                         ],
                       ),

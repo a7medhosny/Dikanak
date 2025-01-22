@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-  TextEditingController searchControlller = TextEditingController();
+  final TextEditingController searchControlller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

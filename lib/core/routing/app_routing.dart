@@ -3,10 +3,13 @@ import 'package:dikanak/core/routing/routes.dart';
 import 'package:dikanak/features/auth/logic/cubits/cubit/auth_cubit.dart';
 import 'package:dikanak/features/auth/presention/screens/login_screen.dart';
 import 'package:dikanak/features/auth/presention/screens/register_screen.dart';
+import 'package:dikanak/features/cart/logic/cubit/cart_cubit.dart';
+import 'package:dikanak/features/favorite/logic/cubit/favorite_cubit.dart';
 import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
 import 'package:dikanak/features/home/presention/screens/home_screen.dart';
 import 'package:dikanak/features/layout/logic/cubits/cubit/layout_cubit.dart';
 import 'package:dikanak/features/layout/presention/screens/layout_screen.dart';
+import 'package:dikanak/features/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,7 +18,8 @@ class AppRouter {
     switch (settings.name) {
       // case Routes.onBoardingScreen:
       //   return MaterialPageRoute(builder: (_) =>OnboardingScreen());
-
+      case Routes.splashScreen:
+        return MaterialPageRoute(builder: (_) => SplashScreen());
       case Routes.loginScreen:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -48,12 +52,13 @@ class AppRouter {
                 create: (context) => LayoutCubit(),
               ),
               BlocProvider(
-                create: (context) => getIt<HomeCubit>()
-                  ..getBannerData()
-                  ..getCategories()
-                  ..getProducts()
-                  ..getFavorites(),
-              ),
+                  create: (context) => getIt<HomeCubit>()
+                    ..getBannerData()
+                    ..getCategories()
+                    ..getProducts()),
+              BlocProvider(
+                  create: (context) => getIt<FavoriteCubit>()..getFavorites()),
+              BlocProvider(create: (context) => getIt<CartCubit>()..getCarts()),
             ],
             child: LayoutScreen(),
           ),

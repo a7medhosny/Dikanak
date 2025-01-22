@@ -1,25 +1,33 @@
+import 'package:dikanak/features/cart/logic/cubit/cart_cubit.dart';
+import 'package:dikanak/features/favorite/logic/cubit/favorite_cubit.dart';
 import 'package:dikanak/features/home/data/model/product_model.dart';
 import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class GetProducts extends StatelessWidget {
+import '../../../common/test.dart';
+
+class GetProducts extends StatefulWidget {
   const GetProducts({super.key});
 
+  @override
+  State<GetProducts> createState() => _GetProductsState();
+}
+
+class _GetProductsState extends State<GetProducts> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
-        if (state is GetProductsFailure || state is UpdateFavoritesFailure) {
+        if (state is GetProductsFailure) {
           final message = (state as dynamic).message ?? 'An error occurred';
           return _buildError(message);
-        } else if (state is GetProductsLoading ||
-            context.read<HomeCubit>().products.isEmpty) {
+        } else if (state is GetProductsLoading || products.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is FilterProductsSucess) {
           return _buildProductsGrid(state.filterProducts);
         } else {
-          return _buildProductsGrid(context.read<HomeCubit>().products);
+          return _buildProductsGrid(products);
         }
       },
     );
@@ -58,11 +66,9 @@ class GetProducts extends StatelessWidget {
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];
-                  final isFavorite = context
-                          .read<HomeCubit>()
-                          .favoritesStatus[product.id.toString()] ??
-                      false;
-
+                  final isFavorite =
+                      favoritesStatus[product.id.toString()] ?? false;
+                  final isInCart = cartStatus[product.id.toString()] ?? false;
                   return Card(
                     elevation: 3,
                     shape: RoundedRectangleBorder(
@@ -100,27 +106,19 @@ class GetProducts extends StatelessWidget {
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  Text(
-                                    '\$${product.price}',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.green,
-                                    ),
+                                  _productPrice(product),
+                                  Spacer(
+                                    flex: 1,
                                   ),
-                                  const Spacer(),
-                                  IconButton(
-                                    onPressed: () {
-                                      BlocProvider.of<HomeCubit>(context)
-                                          .updateFavorites(
-                                              productId: product.id.toString());
-                                    },
-                                    icon: Icon(
-                                      isFavorite
-                                          ? Icons.favorite
-                                          : Icons.favorite_outline,
-                                      color: isFavorite ? Colors.red : null,
-                                    ),
+                                  _buildFavoriteIcon(
+                                      context, isFavorite, product),
+                                  SizedBox(
+                                    width: 24,
                                   ),
+                                  _buildCartIcon(context, isInCart, product),
+                                  Spacer(
+                                    flex: 3,
+                                  )
                                 ],
                               ),
                             ],
@@ -134,6 +132,79 @@ class GetProducts extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildFavoriteIcon(context, bool isFavorite, product) {
+    return Expanded(
+      child: IconButton(
+        onPressed: () {
+          BlocProvider.of<FavoriteCubit>(context)
+              .updateFavorites(productId: product.id.toString());
+          setState(() {});
+        },
+        icon: Icon(
+          isFavorite ? Icons.favorite : Icons.favorite_outline,
+          color: isFavorite ? Colors.red : null,
+        ),
+        splashColor: Colors.transparent, // Removes the splash effect
+        highlightColor: Colors.transparent, // Removes the highlight effect
+      ),
+    );
+  }
+
+  Widget _buildCartIcon(context, bool isInCart, product) {
+    return Expanded(
+      child: IconButton(
+        onPressed: () {
+          BlocProvider.of<CartCubit>(context)
+              .updateCart(productId: product.id.toString());
+          setState(() {});
+        },
+        icon: Icon(
+          isInCart
+              ? Icons.shopping_cart
+              : Icons.shopping_cart_checkout_outlined,
+          color: isInCart ? Colors.red : null,
+        ),
+
+        splashColor: Colors.transparent, // Removes the splash effect
+        highlightColor: Colors.transparent, // Removes the highlight effect
+      ),
+    );
+  }
+
+  Widget _productPrice(ProductModel product) {
+    if (product.discount > 0) {
+      return Column(
+        children: [
+          Text(
+            '\$${product.oldPrice}',
+            style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                decoration: TextDecoration.lineThrough),
+          ),
+          SizedBox(
+            width: 4,
+          ),
+          Text(
+            '\$${product.price}',
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.green,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Text(
+        '\$${product.price}',
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.green,
+        ),
+      );
+    }
   }
 
   Widget _buildError(String message) {

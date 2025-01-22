@@ -19,13 +19,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? cachedToken = CacheNetwork.getCacheData(key: token);
-    final String initialRoute =
-        cachedToken != null ? Routes.layoutScreen : Routes.loginScreen;
+   
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: initialRoute,
+      initialRoute: Routes.splashScreen,
       onGenerateRoute: _appRouter.generateRoute,
     );
   }

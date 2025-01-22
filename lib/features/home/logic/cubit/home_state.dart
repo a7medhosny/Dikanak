@@ -7,7 +7,7 @@ final class HomeInitial extends HomeState {}
 
 final class HomeLoading extends HomeState {}
 
-//Banners States
+/////////////////////////////////////////////Banner State////////////////////////////////////////////////////////
 final class GetBannersLoading extends HomeState {}
 
 final class GetBannersSucess extends HomeState {
@@ -21,7 +21,7 @@ final class GetBannersFailure extends HomeState {
   GetBannersFailure(this.message);
 }
 
-//Categories States
+/////////////////////////////////////////////Category States////////////////////////////////////////////////////////
 
 final class GetCategoriesLoading extends HomeState {}
 
@@ -35,6 +35,7 @@ final class GetCategoriesFailure extends HomeState {
 
   GetCategoriesFailure(this.message);
 }
+/////////////////////////////////////////////Product State////////////////////////////////////////////////////////
 
 final class GetProductsLoading extends HomeState {}
 
@@ -54,23 +55,3 @@ final class FilterProductsSucess extends HomeState {
   FilterProductsSucess({required this.filterProducts});
 }
 
-final class UpdateFavoritesSucess extends HomeState {}
-
-final class UpdateFavoritesFailure extends HomeState {
-  final String message;
-
-  UpdateFavoritesFailure(this.message);
-}
-
-final class GetFavoritesLoading extends HomeState {}
-
-final class GetFavoritesSucess extends HomeState {
-  final List<FavoriteProductModel> favorites;
-  GetFavoritesSucess({required this.favorites});
-}
-
-final class GetFavoritesFailure extends HomeState {
-  final String message;
-
-  GetFavoritesFailure(this.message);
-}
