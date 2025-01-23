@@ -11,13 +11,19 @@ class FavoritesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 20),
-          child: const Text(
+        title: const Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Text(
             'Favorites',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
           ),
         ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.teal,
       ),
       body: BlocBuilder<FavoriteCubit, FavoriteState>(
         builder: (context, state) {
@@ -40,7 +46,11 @@ class FavoritesScreen extends StatelessWidget {
       return const Center(
         child: Text(
           'No favorites yet!',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
         ),
       );
     }
@@ -50,82 +60,107 @@ class FavoritesScreen extends StatelessWidget {
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 0.8,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.75,
         ),
         itemCount: favorites.length,
         itemBuilder: (context, index) {
           final product = favorites[index];
-          return Card(
-            elevation: 3,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
+          return _buildFavoriteCard(context, product);
+        },
+      ),
+    );
+  }
+
+  Widget _buildFavoriteCard(
+      BuildContext context, FavoriteProductModel product) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      elevation: 4,
+      shadowColor: Colors.teal.withOpacity(0.3),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
             ),
+            child: Image.network(
+              product.image,
+              height: 120,
+              width: double.infinity,
+              fit: BoxFit.contain,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            (loadingProgress.expectedTotalBytes ?? 1)
+                        : null,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    color: Colors.grey,
+                    size: 48,
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0),
+                Text(
+                  product.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: Image.network(
-                    product.image,
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product.name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      '\$${product.price}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            '\$${product.price}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.green,
-                            ),
-                          ),
-                          const Spacer(),
-                          IconButton(
-                            onPressed: () {
-                              BlocProvider.of<FavoriteCubit>(context)
-                                  .updateFavorites(
-                                      productId: product.id.toString());
-                            },
-                            icon: const Icon(
-                              Icons.favorite,
-                              color: Colors.red,
-                            ),
-                            splashColor:
-                                Colors.transparent, // Removes the splash effect
-                            highlightColor: Colors
-                                .transparent, // Removes the highlight effect
-                          ),
-                        ],
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () {
+                        context
+                            .read<FavoriteCubit>()
+                            .updateFavorites(productId: product.id.toString());
+                      },
+                      icon: const Icon(
+                        Icons.favorite,
+                        color: Colors.red,
                       ),
-                    ],
-                  ),
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                  ],
                 ),
               ],
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -136,7 +171,10 @@ class FavoritesScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Text(
           message,
-          style: const TextStyle(color: Colors.red, fontSize: 16),
+          style: const TextStyle(
+            color: Colors.red,
+            fontSize: 16,
+          ),
           textAlign: TextAlign.center,
         ),
       ),

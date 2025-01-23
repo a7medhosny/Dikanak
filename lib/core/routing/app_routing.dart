@@ -9,6 +9,7 @@ import 'package:dikanak/features/home/logic/cubit/home_cubit.dart';
 import 'package:dikanak/features/home/presention/screens/home_screen.dart';
 import 'package:dikanak/features/layout/logic/cubits/cubit/layout_cubit.dart';
 import 'package:dikanak/features/layout/presention/screens/layout_screen.dart';
+import 'package:dikanak/features/person/logic/cubit/person_cubit.dart';
 import 'package:dikanak/features/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,6 +60,8 @@ class AppRouter {
               BlocProvider(
                   create: (context) => getIt<FavoriteCubit>()..getFavorites()),
               BlocProvider(create: (context) => getIt<CartCubit>()..getCarts()),
+              BlocProvider(
+                  create: (context) => getIt<PersonCubit>()..getPersonInfo()),
             ],
             child: LayoutScreen(),
           ),

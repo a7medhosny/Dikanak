@@ -12,7 +12,7 @@ class CartCubit extends Cubit<CartState> {
   List<ProductModel> cartProducts = [];
   final CartRepo cartRepo;
   getCarts() async {
-    // emit(GetFavoritesLoading());
+    emit(GetCartsLoading());
     try {
       var response = await cartRepo.getCarts();
       if (response['success'] == true) {

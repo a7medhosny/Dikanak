@@ -14,9 +14,15 @@ class CartScreen extends StatelessWidget {
           padding: EdgeInsets.only(left: 20),
           child: Text(
             'Cart',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
           ),
         ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.teal,
       ),
       body: BlocBuilder<CartCubit, CartState>(
         builder: (context, state) {
@@ -39,10 +45,15 @@ class CartScreen extends StatelessWidget {
       return const Center(
         child: Text(
           'Your cart is empty!',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
         ),
       );
     }
+
     num total = cartProducts.fold(0, (sum, product) => sum + product.price);
 
     return Padding(
@@ -53,92 +64,123 @@ class CartScreen extends StatelessWidget {
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.8,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.75,
               ),
               itemCount: cartProducts.length,
               itemBuilder: (context, index) {
                 final product = cartProducts[index];
-                return Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          topRight: Radius.circular(10.0),
-                        ),
-                        child: Image.network(
-                          product.image,
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product.name,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Text(
-                                  '\$${product.price}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                                const Spacer(),
-                                IconButton(
-                                  onPressed: () {
-                                    BlocProvider.of<CartCubit>(context)
-                                        .updateCart(
-                                      productId: product.id.toString(),
-                                    );
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  splashColor: Colors
-                                      .transparent, // Removes the splash effect
-                                  highlightColor: Colors
-                                      .transparent, // Removes the highlight effect
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+                return _buildCartCard(context, product);
               },
             ),
           ),
-          Center(
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.teal.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Text(
               "Total Price: \$${total.toStringAsFixed(2)}",
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: Colors.teal,
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCartCard(BuildContext context, ProductModel product) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      elevation: 4,
+      shadowColor: Colors.teal.withOpacity(0.3),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
+            ),
+            child: Image.network(
+              product.image,
+              height: 120,
+              width: double.infinity,
+              fit: BoxFit.contain,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            (loadingProgress.expectedTotalBytes ?? 1)
+                        : null,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    color: Colors.grey,
+                    size: 48,
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  product.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      '\$${product.price}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: () {
+                        BlocProvider.of<CartCubit>(context).updateCart(
+                          productId: product.id.toString(),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -152,7 +194,10 @@ class CartScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Text(
           message,
-          style: const TextStyle(color: Colors.red, fontSize: 16),
+          style: const TextStyle(
+            color: Colors.red,
+            fontSize: 16,
+          ),
           textAlign: TextAlign.center,
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:dikanak/features/cart/presention/screens/carts_screen.dart';
 import 'package:dikanak/features/favorite/presention/screens/favorites_screen.dart';
 import 'package:dikanak/features/home/presention/screens/categories_screen.dart';
 import 'package:dikanak/features/home/presention/screens/home_screen.dart';
+import 'package:dikanak/features/person/presention/screens/person_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -16,7 +17,7 @@ class LayoutCubit extends Cubit<LayoutState> {
     CategoriesScreen(),
     FavoritesScreen(),
     CartScreen(),
-    // PersonScreen(),
+    PersonScreen(),
   ];
   changeIndex({required int index}) {
     bottomNavIndex = index;
