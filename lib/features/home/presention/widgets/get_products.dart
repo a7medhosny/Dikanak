@@ -107,18 +107,12 @@ class _GetProductsState extends State<GetProducts> {
                               Row(
                                 children: [
                                   _productPrice(product),
-                                  Spacer(
-                                    flex: 1,
-                                  ),
                                   _buildFavoriteIcon(
                                       context, isFavorite, product),
                                   SizedBox(
-                                    width: 24,
+                                    width: 3,
                                   ),
                                   _buildCartIcon(context, isInCart, product),
-                                  Spacer(
-                                    flex: 3,
-                                  )
                                 ],
                               ),
                             ],
@@ -135,41 +129,37 @@ class _GetProductsState extends State<GetProducts> {
   }
 
   Widget _buildFavoriteIcon(context, bool isFavorite, product) {
-    return Expanded(
-      child: IconButton(
-        onPressed: () {
-          BlocProvider.of<FavoriteCubit>(context)
-              .updateFavorites(productId: product.id.toString());
-          setState(() {});
-        },
-        icon: Icon(
-          isFavorite ? Icons.favorite : Icons.favorite_outline,
-          color: isFavorite ? Colors.red : null,
-        ),
-        splashColor: Colors.transparent, // Removes the splash effect
-        highlightColor: Colors.transparent, // Removes the highlight effect
+    return IconButton(
+      onPressed: () {
+        BlocProvider.of<FavoriteCubit>(context)
+            .updateFavorites(productId: product.id.toString());
+        setState(() {});
+      },
+      icon: Icon(
+        isFavorite ? Icons.favorite : Icons.favorite_outline,
+        color: isFavorite ? Colors.red : null,
+        size: 27,
       ),
+      splashColor: Colors.transparent, // Removes the splash effect
+      highlightColor: Colors.transparent, // Removes the highlight effect
     );
   }
 
   Widget _buildCartIcon(context, bool isInCart, product) {
-    return Expanded(
-      child: IconButton(
-        onPressed: () {
-          BlocProvider.of<CartCubit>(context)
-              .updateCart(productId: product.id.toString());
-          setState(() {});
-        },
-        icon: Icon(
-          isInCart
-              ? Icons.shopping_cart
-              : Icons.shopping_cart_checkout_outlined,
-          color: isInCart ? Colors.red : null,
-        ),
-
-        splashColor: Colors.transparent, // Removes the splash effect
-        highlightColor: Colors.transparent, // Removes the highlight effect
+    return IconButton(
+      onPressed: () {
+        BlocProvider.of<CartCubit>(context)
+            .updateCart(productId: product.id.toString());
+        setState(() {});
+      },
+      icon: Icon(
+        isInCart ? Icons.shopping_cart : Icons.shopping_cart_checkout_outlined,
+        color: isInCart ? Colors.red : null,
+        size: 27,
       ),
+
+      splashColor: Colors.transparent, // Removes the splash effect
+      highlightColor: Colors.transparent, // Removes the highlight effect
     );
   }
 

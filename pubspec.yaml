@@ -33,6 +33,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6
+  flutter_launcher_icons: ^0.14.3
+  flutter_stripe: ^11.4.0
   get_it: ^8.0.3
   shared_preferences: ^2.3.3
   smooth_page_indicator: ^1.2.0+3
@@ -78,3 +80,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.webp"
+  min_sdk_android: 21 # android min sdk min:16, default 21

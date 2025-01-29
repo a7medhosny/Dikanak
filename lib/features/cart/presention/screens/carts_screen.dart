@@ -24,23 +24,41 @@ class CartScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.teal,
       ),
-      body: BlocBuilder<CartCubit, CartState>(
+      body: BlocConsumer<CartCubit, CartState>(
+        listener: (context, state) {
+          if (state is PaymentSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Payment Successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state is PaymentFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
         builder: (context, state) {
           if (state is GetCartFailure) {
             return _buildError(state.message);
           } else if (state is GetCartsLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is GetCartSucess) {
-            return _buildCartGrid(state.cartProducts);
+            return _buildCartGrid(state.cartProducts, context);
           } else {
-            return _buildCartGrid(context.read<CartCubit>().cartProducts);
+            return _buildCartGrid(
+                context.read<CartCubit>().cartProducts, context);
           }
         },
       ),
     );
   }
 
-  Widget _buildCartGrid(List<ProductModel> cartProducts) {
+  Widget _buildCartGrid(List<ProductModel> cartProducts, context) {
     if (cartProducts.isEmpty) {
       return const Center(
         child: Text(
@@ -76,19 +94,36 @@ class CartScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.teal.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              "Total Price: \$${total.toStringAsFixed(2)}",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.teal,
-              ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Text(
+                  "Total: \$${total.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    await BlocProvider.of<CartCubit>(context).processPayment(
+                      amount: total.toInt(),
+                      currency: 'usd',
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 12),
+                  ),
+                  child: const Text(
+                    "Pay Now",
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),

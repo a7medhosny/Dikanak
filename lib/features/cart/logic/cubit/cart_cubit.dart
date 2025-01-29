@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:dikanak/core/widgets/stripe_payment/payment_manager.dart';
 import 'package:dikanak/features/cart/data/repo/cart_repo.dart';
 import 'package:meta/meta.dart';
 
@@ -47,6 +48,24 @@ class CartCubit extends Cubit<CartState> {
       // Revert local state on error
       cartStatus[productId] = !(cartStatus[productId] ?? false);
       emit(UpdateCartFailure(e.toString()));
+    }
+  }
+
+  Future<void> processPayment(
+      {required int amount, required String currency}) async {
+    print('Process pay');
+    emit(PaymentLoading());
+    try {
+      await PaymentManager.makePayment(amount, currency);
+      emit(PaymentSuccess());
+    } catch (e) {
+      String errorMes = "";
+      if (e.toString().toLowerCase().contains('cancel')) {
+        errorMes = "Canceled";
+      } else {
+        errorMes = "Payment failed";
+      }
+      emit(PaymentFailure(errorMes));
     }
   }
 }

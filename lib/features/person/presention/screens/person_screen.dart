@@ -1,5 +1,4 @@
 import 'package:dikanak/core/helpers/local_storage/shared_preferences.dart';
-import 'package:dikanak/features/auth/logic/cubits/cubit/auth_cubit.dart';
 import 'package:dikanak/features/person/logic/cubit/person_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -21,6 +21,7 @@ class AppRouter {
       //   return MaterialPageRoute(builder: (_) =>OnboardingScreen());
       case Routes.splashScreen:
         return MaterialPageRoute(builder: (_) => SplashScreen());
+     
       case Routes.loginScreen:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(

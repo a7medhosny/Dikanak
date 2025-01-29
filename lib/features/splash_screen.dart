@@ -4,6 +4,7 @@ import 'package:dikanak/core/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
